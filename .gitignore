@@ -1,0 +1,7 @@
+__pycache__
+.auctex-auto
+modules/__pycache__
+docs/docs.aux
+docs/docs.log
+docs/docs.out
+docs/docs.toc

@@ -1,0 +1,242 @@
+\documentclass[11pt]{article}
+
+\usepackage{babel}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[top=0.6in,bottom=0.6in,right=1in,left=1in]{geometry}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{rotating}
+\author{Guelfen Abdelheq}
+\date{\today}
+\title{Documentation}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{darkblue}{RGB}{31,56,100}
+
+\lstdefinestyle{PythonStyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4
+}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% COVER PAGE %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+
+\begin{center}
+\begin{minipage}{10cm}
+	\begin{center}
+	\textbf{UNIVERSITE DES SCIENCES ET DE LA TECHNOLOGIE USTHB}\\[0.1cm]
+    \textbf{DEPARTEMENT D'INFORMATIQUE}
+	\end{center}
+\end{minipage}\hfill
+
+
+\textsc{\Large }\\[2.5cm]
+{\large \bfseries Project TP SPS}\\[1cm]
+
+\textsc{\Large }\\[1cm]
+\rule{\linewidth}{0.3mm} \\[0.4cm]
+{ \huge \bfseries\color{darkblue} A Python Code Documentation for Genomic Sequence Analysis\\[0.4cm] }
+\rule{\linewidth}{0.3mm} \\[3cm]
+
+
+% Author and supervisor
+\noindent
+\begin{minipage}{0.4\textwidth}
+  \begin{flushleft} \large
+    \emph{Présenté par :}\\
+    \textbf{GUELFEN Abdelheq}\\
+  \end{flushleft}
+\end{minipage}
+
+\vfill
+{\textbf{\large {Année universitaire} 2023-2024}}
+\end{center}
+\end{titlepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% END PAGE %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+This is a python code documentation about a program that automate the proccess of analysing sets of DNA.\\
+Source code is seperated into 3 directories and 2 files:
+\begin{itemize}
+\item{\textbf{data}: data is the folder where our DNA sequences are stored}
+\item{\textbf{modules}: This folder has three objects, each with a specific role}
+\item{\textbf{output}: output is the folder where our results are stored}
+\item{\textbf{main.py}: This is our main entry point to the program}
+\item{\textbf{variables.py}: This file is where global variables are stored and will be useed throught the lifetime of the program}
+\end{itemize}
+
+\section{Main file (main.py)}
+We are importing all the modules we need from dir:modules
+\begin{lstlisting}[language=Python, style=PythonStyle]
+from modules.dna_generator import DNA_Genrator
+from modules.dna_processor import DNA_Processor
+from modules.protein_builder import Protein_Builder
+
+from variables import results
+\end{lstlisting}
+The function starts by showing an interactive menu with multiple choices to choose from.\\
+User should choose a number from (1-11) according to the menu.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def main():
+    print(
+        """
+ 1: Generate a DNA
+ 2: Validate the DNA
+ 3: Calculate the necleotides base frequency
+ 4: Translate DNA to RNA
+ 5: Translate RNA into a protein
+ 6: Calculate the inverse complement of a DNA
+ 7: Calculate the taux of GC in a DNA
+ 8: Calculate the frequency of a codons in a DNA
+ 9: Make a random mutations to DNA
+10: Find a motif in a DNA
+11: Save results in a file
+"""
+    )
+\end{lstlisting}
+An infinite loop is used to keep the program running,
+for every number chosen a specific function gets executed to solve that problem
+\begin{lstlisting}[language=Python, style=PythonStyle]
+while True:
+    choice = input("> ")
+
+    if choice == "quit()":
+        break
+
+    if choice == "1":
+        DNA_GENRATOR().generate()
+
+    if not results.get("DNA"):
+        print("[ERROR]: Please generate a set of DNA first")
+        continue
+
+    if choice == "2":
+        DNA().validate()
+        print(f"DNA is validated: {results['is_dna_validated']}", "\n")
+
+    if choice == "3":
+        ...
+
+\end{lstlisting}
+The program can not manipulate DNA without generating a sequence first, so this condition limit and warn user to generate a sequence of DNA first
+\begin{lstlisting}[language=Python, style=PythonStyle]
+if not results.get("DNA"):
+    print("[ERROR]: Please generate a set of DNA first")
+    continue
+\end{lstlisting}
+
+\section{DNA generator(modules/dna\_generator.py)}
+\subsubsection{Function generate()}
+There are two type of generating a DNA sequence, either randomly or from a file.\\
+The function prints a submenu and take a choice from the user and execute one of the two functions \textbf{generateRandomly()} or \textbf{chooseFromFile()}.\\
+The input is limited to \textbf{(a, b or 0)} by using the \(assert\) keyword.\\
+The user can choose \(0\) to go back to main menu
+
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def generate(self):
+    print(
+        """a: generate a random set
+b: choose from a predefined sets
+0: go back to main menu
+    """
+    )
+
+    while True:
+        choice = input("(1: generate DNA)>> ")
+
+        try:
+            assert choice in ("a", "b", "0")
+
+            if choice == "a":
+                results["DNA"] = self.generate_randomly()
+                print(results["DNA"], "\n")
+                break
+
+            if choice == "b":
+                results["DNA"] = self.choose_from_file()
+                print(results["DNA"], "\n")
+                break
+
+            if choice == "0":
+                break
+
+        except (AssertionError, ValueError):
+            print("ERROR: Please enter a valid choice")
+\end{lstlisting}
+
+\subsubsection{Function generateRandomly()}
+This function takes an input(number of sequences to generate) and return a DNA sequence.\\
+We choose a Random necleotide and save it in a list for the number of choice entered by user, this has been implemented using list comprehension (simple way of writing for loop).\\
+\textbf{''.join()} is used to trnasform a list to a string.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def generate_randomly(self):
+    while True:
+        print("how many sequence do you want?")
+        choice = input("(1: generate DNA)>> ")
+
+        try:
+            assert choice.isdecimal
+
+            return "".join([random.choice(SYMBOLS) for _ in range(int(choice))])
+        except (AssertionError, ValueError):
+            print("ERROR: Please enter a valid number\n")
+\end{lstlisting}
+
+\subsubsection{Function chooseFromFile()}
+This function presents a menu of DNA sequences, reads them from a file, and allows the user to choose one by entering a corresponding number. It validates the input and returns the selected DNA sequence. If the input is invalid, it prints an error message and prompts the user to enter a valid number.
+
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def choose_from_file(self):
+    print(
+        """1: sequence 1 consisting of 1000 bases.
+2: sequence 2 consisting of 1000 bases.
+3: sequence 3 consisting of 500 bases.
+4: sequence 4 consisting of 100 bases.
+5: sequence 5 consisting of 700 bases.
+    """
+    )
+
+    sequences = self.read_fasta()
+
+    while True:
+        choice = input("(1: generate DNA)>> ")
+        try:
+            assert choice.isdecimal
+
+            return sequences[int(choice) - 1]
+
+        except (AssertionError, ValueError):
+            print("ERROR: Please enter a valid number\n")
+\end{lstlisting}
+
+\end{document}
