@@ -22,7 +22,8 @@ class DNA_Processor:
 
                 assert base.upper() in SYMBOLS
 
-                print(f"frequency of {base} is : {results.get('DNA','').count(base)}\n")
+                frequency = results.get("DNA", "").count(base)
+                print(f"frequency of {base} is : {frequency}\n")
 
             except (AssertionError, ValueError):
                 print("[ERROR]: Enter a valid necleotide base\n")
@@ -58,10 +59,12 @@ class DNA_Processor:
                     random_necleotide = random.choice(SYMBOLS)
                     random_index = random.randint(0, len(dna) - 1)
 
+                    # don't make mutation on the same necleotide
                     while random_index in random_indexes:
                         random_index = random.randint(0, len(dna) - 1)
                     random_indexes.append(random_index)
 
+                    # can't make mutation on the same necleotide
                     while dna[random_index] == random_necleotide:
                         random_necleotide = random.choice(SYMBOLS)
 
@@ -69,11 +72,14 @@ class DNA_Processor:
                     dna[random_index] = random_necleotide
                     results["DNA"] = "".join(dna)
 
-                print(f"new mutated DNA:\n{results.get('DNA','')}")
                 break
 
             except (AssertionError, ValueError):
                 print("[ERROR]: Enter a valid necleotide base\n")
+            finally:
+                # clear old RNA and protein
+                results["RNA"] = ""
+                results["proteins"] = []
 
     def find_motif(self):
         print("Enter motif you want to search for")

@@ -60,7 +60,7 @@
 
 \textsc{\Large }\\[1cm]
 \rule{\linewidth}{0.3mm} \\[0.4cm]
-{ \huge \bfseries\color{darkblue} A Python Code Documentation for Genomic Sequence Analysis\\[0.4cm] }
+{ \huge \bfseries\color{darkblue} A Python Code Documentation for DNA Sequence Analysis\\[0.4cm] }
 \rule{\linewidth}{0.3mm} \\[3cm]
 
 
@@ -124,6 +124,7 @@ def main():
 """
     )
 \end{lstlisting}
+
 An infinite loop is used to keep the program running,
 for every number chosen a specific function gets executed to solve that problem
 \begin{lstlisting}[language=Python, style=PythonStyle]
@@ -146,7 +147,6 @@ while True:
 
     if choice == "3":
         ...
-
 \end{lstlisting}
 The program can not manipulate DNA without generating a sequence first, so this condition limit and warn user to generate a sequence of DNA first
 \begin{lstlisting}[language=Python, style=PythonStyle]
@@ -237,6 +237,201 @@ def choose_from_file(self):
 
         except (AssertionError, ValueError):
             print("ERROR: Please enter a valid number\n")
+\end{lstlisting}
+
+\section{DNA processor(modules/dna\_processor.py)}
+\subsubsection{Method validate()}
+The \textbf{validate} method checks if the DNA sequence stored in the DNA key of the results dictionary consists only of valid symbols specified in the SYMBOLS set. It sets the \textbf{isDnaValidated} key in the results dictionary to indicate whether the DNA sequence is valid or not.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def validate(self):
+    is_validated = set(results.get("DNA", "")).issubset(SYMBOLS)
+
+    results["is_dna_validated"] = is_validated
+\end{lstlisting}
+\subsubsection{Method calculateFrequency()}
+The \textbf{calculateFrequency} method prompts the user to enter a nucleotide base (A, T, C, or G) to calculate its frequency in a DNA sequence. The user can enter '0' to return to the main menu. The method validates the input, ensuring it is a valid nucleotide base, and then calculates and prints the frequency of the entered base in the DNA sequence by using \textbf{count()} method. If an invalid input is provided, it catches the assertion error or value error, prints an error message, and prompts the user to enter a valid nucleotide base.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def calculate_frequency(self):
+    print("Enter necleotide to calculate frequency (A,T,C,G)")
+    print("Enter 0 to go back to main menu\n")
+
+    while True:
+        try:
+            base = input("(3: Calculate frequency)>> ")
+            if base == "0":
+                print()
+                break
+
+            assert base.upper() in SYMBOLS
+
+            print(f"frequency of {base} is : {results.get('DNA','').count(base)}\n")
+
+        except (AssertionError, ValueError):
+            print("[ERROR]: Enter a valid necleotide base\n")
+\end{lstlisting}
+
+\subsubsection{Method translateToRNA()}
+The \textbf{translateToRNA} method takes the DNA sequence stored in the "DNA" key of the results dictionary, replaces all occurrences of "T" with "U" using \textbf{replace()} method and then stores the resulting RNA sequence in the "RNA" key of the results dictionary.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def translate_to_RNA(self):
+    results["RNA"] = results.get("DNA", "").replace("T", "U")
+\end{lstlisting}
+\subsubsection{Method calculateInverse()}
+The \textbf{calculateInverse} method generates the DNA inverse sequence by mapping each nucleotide in the original DNA sequence to its complementary base using the \textbf{COMPLEMENT} dictionary. It then joins these complementary bases together to form the inverse sequence. The resulting DNA inverse sequence is stored in the \textbf{DNAInverse} key of the results dictionary. \textbf{map} function in Python applies a given function to each item of an iterable, it does the same thing as \textbf{for loop}
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def calculate_inverse(self):
+    inverse = "".join(
+        map(lambda base: COMPLEMENT.get(base, ""), results.get("DNA", ""))
+    )
+
+    results["DNA_inverse"] = inverse
+\end{lstlisting}
+\subsubsection{Method calculateGCContent()}
+The \textbf{calculateGCContent} method computes the GC (Guanine-Cytosine) content percentage of a DNA sequence. It retrieves the DNA sequence from the results dictionary, counts the occurrences of "G" and "C,", then stores the result as a formatted string in the \textbf{GCcontent} key of the results dictionary.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def calculate_GC_content(self):
+    dna = results.get("DNA", "")
+
+    gc_content = (dna.count("G") + dna.count("C")) / len(dna) * 100
+    results["GC_content"] = f"{gc_content}%"
+\end{lstlisting}
+\subsubsection{Method makeMutations()}
+The \textbf{makeMutations} method prompts the user to enter the number of random mutations they want to introduce into a DNA sequence. It then performs the specified number of mutations by randomly selecting nucleotide positions and replacing the corresponding bases with other randomly chosen nucleotides. The method ensures that each mutation results in a different nucleotide from the original sequence. The updated DNA sequence is stored in the "DNA" key of the results dictionary.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def make_mutations(self):
+    print("Enter the number of mutation you want to make:")
+
+    dna = results.get("DNA", "")
+
+    while True:
+        try:
+            choice = input("(9: Random mutations)>> ")
+            assert choice.isdecimal
+
+            random_indexes = []
+            for _ in range(int(choice)):
+                random_necleotide = random.choice(SYMBOLS)
+                random_index = random.randint(0, len(dna) - 1)
+
+                while random_index in random_indexes:
+                    random_index = random.randint(0, len(dna) - 1)
+                random_indexes.append(random_index)
+
+                while dna[random_index] == random_necleotide:
+                    random_necleotide = random.choice(SYMBOLS)
+
+                dna = list(dna)
+                dna[random_index] = random_necleotide
+                results["DNA"] = "".join(dna)
+
+            print(f"new mutated DNA:\n{results.get('DNA','')}")
+            break
+
+        except (AssertionError, ValueError):
+            print("[ERROR]: Enter a valid necleotide base\n")
+\end{lstlisting}
+\subsubsection{Method findMotif()}
+The \textbf{findMotif} method prompts the user to enter a DNA motif they want to search for within a given DNA sequence. It handles the input, ensuring the motif consists of valid nucleotide bases. The method then uses regular expressions (re.finditer) to find all occurrences of the motif in the DNA sequence and prints the indexes where the motif is found. The user can enter '0' to return to the main menu.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def find_motif(self):
+    print("Enter motif you want to search for")
+    print("Enter 0 to go back to main menu\n")
+
+    while True:
+        try:
+            motif = input("(10: Find motif)>> ")
+            if motif == "0":
+                print()
+                break
+
+            for i in list(motif):
+                assert i.upper() in SYMBOLS
+
+            occ = [
+                m.start()
+                for m in re.finditer(f"(?={motif})", results.get("DNA", ""))
+            ]
+            print(f"This motif has found at these indexes: {occ}\n")
+
+        except (AssertionError, ValueError):
+            print("[ERROR]: Enter a valid necleotide base\n")
+\end{lstlisting}
+
+\section{Protein builder(modules/protein\_builder.py)}
+\subsubsection{Method generateFromRna()}
+The \textbf{generateFromRna} method checks if an RNA sequence is present in the results dictionary. If not, it translates the DNA sequence to RNA. It then searches for protein-coding sequences in the RNA using a specified pattern and translates them into amino acid sequences using a codon table. The resulting protein sequences, starting with the "M" (methionine) codon, are stored in the results dictionary under the "proteins" key.
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def generate_from_rna(self):
+    if not results.get("RNA"):
+        DNA().translate_to_RNA()
+
+    pattern = r"AUG((?:.{3})*?)(UAA|UAG|UGA)"
+    matches = re.findall(pattern, results.get("RNA", ""))
+
+    protiens = []
+    for seq, _ in matches:
+        sequences = [seq[i : i + 3] for i in range(0, len(seq), 3)]
+        acide_amino = map(lambda seq: codon_table.get(seq, ""), sequences)
+
+        protiens.append("M" + "".join(acide_amino))
+
+    results["proteins"] = protiens
+\end{lstlisting}
+
+\subsubsection{Method calculateCodonsFrequencey()}
+The \textbf{calculateCodonsFrequencey} method checks if protein sequences exist in the results. If not, it generates them using the \textbf{generateFromRna} method. Then, it calculates and records the frequency of each unique amino acid in the proteins. The results are stored in the results dictionary under the key "codonsFrequency".
+
+\begin{lstlisting}[language=Python, style=PythonStyle]
+def calculate_codons_frequencey(self):
+    if not results.get("proteins"):
+        self.generate_from_rna()
+
+    codons_frequencey = {}
+
+    for protein in results.get("proteins", []):
+        for acido_amino in set(protein):
+            if codons_frequencey.get(acido_amino) is None:
+                codons_frequencey.setdefault(
+                    acido_amino, protein.count(acido_amino)
+                )
+            else:
+                codons_frequencey[acido_amino] = protein.count(
+                    acido_amino
+                ) + codons_frequencey.get(acido_amino, 0)
+
+    results["codons_frequency"] = codons_frequencey
+\end{lstlisting}
+
+\section{Variables file (variables.py)}
+This file contains global variables that will be used throught the execution of the program.
+
+\begin{lstlisting}[language=Python, style=PythonStyle]
+results = {
+    "DNA": "",
+    "DNA_inverse": "",
+    "RNA": "",
+    "proteins": [],
+    "is_dna_validated": False,
+    "GC_content": "",
+    "codons_frequency": "",
+}
+
+# Global constants
+SYMBOLS = ("A", "T", "C", "G")
+COMPLEMENT = {
+    "A": "T",
+    "T": "A",
+    "G": "C",
+    "C": "G",
+}
+codon_table = {
+    "UUU": "F",
+    "UUC": "F",
+    "UUA": "L",
+    "UUG": "L",
+    "CUU": "L",
+    ...
+}
 \end{lstlisting}
 
 \end{document}

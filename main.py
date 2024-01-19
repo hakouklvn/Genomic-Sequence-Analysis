@@ -32,42 +32,46 @@ def main():
             DNA_GENRATOR().generate()
 
         if not results.get("DNA"):
-            print("[ERROR]: Please generate a set of DNA first")
+            print("[ERROR]: Please generate a set of DNA_Processor first")
             continue
 
         if choice == "2":
-            DNA().validate()
-            print(f"DNA is validated: {results['is_dna_validated']}", "\n")
+            DNA_Processor().validate()
+            print(f"DNA_Processor is validated: {results['is_dna_validated']}", "\n")
 
         if choice == "3":
-            DNA().calculate_frequency()
+            DNA_Processor().calculate_frequency()
 
         if choice == "4":
-            DNA().translate_to_RNA()
+            DNA_Processor().translate_to_RNA()
             print(f"The RNA sequence is: {results.get('RNA')}\n")
 
         if choice == "5":
-            PROTEIN().generate_from_rna()
-            print(f"Proteins found in this DNA are:")
+            Protein_Builder().generate_from_rna()
+            print(f"Proteins found in this DNA_Processor are:")
             [print(f"{protein}") for protein in results.get("proteins", [])]
             print()
 
         if choice == "6":
-            DNA().calculate_inverse()
+            DNA_Processor().calculate_inverse()
             print(f"DNA inverse is: {results['DNA_inverse']}")
 
         if choice == "7":
-            DNA().calculate_GC_content()
-            print(f"the GC content of the DNA sequence is {results['GC_content']}%")
+            DNA_Processor().calculate_GC_content()
+            print(
+                f"the GC content of the DNA_Processor sequence is {results['GC_content']}"
+            )
 
         if choice == "8":
-            PROTEIN().calculate_codons_frequencey()
+            Protein_Builder().calculate_codons_frequencey()
+            print(f"codons frequency:", results["codons_frequency"])
 
         if choice == "9":
-            DNA().make_mutations()
+            DNA_Processor().make_mutations()
+            print("new mutated DNA:", results.get("DNA", ""))
 
         if choice == "10":
-            DNA().find_motif()
+            DNA_Processor().find_motif()
 
         if choice == "11":
             DNA_GENRATOR().save_to_file()
